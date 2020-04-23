@@ -32,9 +32,10 @@ public class View
 		System.out.println("3. 2A");
 		System.out.println("4. 3A");
 		System.out.println("5. 1C");
-		System.out.println("6. 2C");
-		System.out.println("7. 3C");
-		System.out.println("8. Exit");
+		System.out.println("6. 2C (Solo si no ha corrido la opción 3C)");
+		System.out.println("7. 3C (Solo si no ha corrido la opción 2C)");
+		System.out.println("8. Conclusión");
+		System.out.println("9. Exit");
 		System.out.println("Dar el numero de opcion a resolver, luego oprimir tecla Return: (e.g., 1):");
 	}
 
@@ -47,6 +48,10 @@ public class View
 		System.out.println(mensaje);
 	}		
 
+	/**
+	 * Imprimer la informacion de un comparendo
+	 * @param inf Comaprendo a imprimir
+	 */
 	public void printComparendo(Comparendo inf)
 	{
 		System.out.println("[");
@@ -58,6 +63,7 @@ public class View
 		System.out.println("Infracción: "+inf.getInfr());
 		System.out.println("Descripción: "+inf.getDesc());
 		System.out.println("Localidad: "+inf.getLocalidad());
+		System.out.println("Municipio: "+inf.getMunicipio());
 		System.out.println("Coordenadas: "+inf.getLatitud()+" , "+inf.getLongitud());
 		System.out.println("]");
 	}
@@ -69,14 +75,22 @@ public class View
 	public void printLista(ListaEncadenada lista)
 	{
 		System.out.println("Comparendos buscados: {");
-		for(Nodo i=lista.darPrimero() ; i!=null ; i=i.darSiguiente())
-		{
-			Comparendo inf = (Comparendo) i.darElemento();
-			printComparendo(inf);
-		}
+		if(lista!=null)
+			for(Nodo i=lista.darPrimero() ; i!=null ; i=i.darSiguiente())
+			{
+				Comparendo inf = (Comparendo) i.darElemento();
+				printComparendo(inf);
+			}
+		else
+			System.out.println("No se encontró comparendo");
 		System.out.println("}");
 	}
 
+	/**
+	 * Imprime le histograma
+	 * @param lista Lista con al informacion
+	 * @param D Tamaño de los intervalos
+	 */
 	public void printHist(ListaEncadenada lista,int D)
 	{
 		System.out.println("Intervalo              |Numero de comparendos");
@@ -109,6 +123,10 @@ public class View
 		}
 	}
 
+	/**
+	 * Imprime las estadísticas
+	 * @param listas Arreglo de dols listas encadenadas con la información
+	 */
 	public void printStats(ListaEncadenada[] listas)
 	{
 		try

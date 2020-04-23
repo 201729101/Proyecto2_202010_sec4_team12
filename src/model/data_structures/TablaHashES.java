@@ -15,7 +15,7 @@ public class TablaHashES<K extends Comparable<K> , V>
 	/**
 	 * Capacidad de la tabla
 	 */
-	private int M = 20;
+	private int M = 365;
 
 	/**
 	 * Capacidad inicial de la tabla

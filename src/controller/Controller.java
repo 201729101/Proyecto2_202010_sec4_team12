@@ -45,7 +45,7 @@ public class Controller {
 			switch(option){
 			case 1:
 				modelo = new Modelo(); 
-				Comparendo retorno = modelo.cargarDatos("./data/Comparendos_DEI_2018_Bogotá_D.C_small.geojson");
+				Comparendo retorno = modelo.cargarDatos("./data/Comparendos_DEI_2018_Bogotá_D.C.geojson");
 				//				Comparendo[] retorno = modelo.cargarDatos("./data/comparendos_dei_2018_small2.geojson");
 				view.printMessage("Numero de comparendos: "+modelo.getCola().tamano());
 				view.printMessage("Comparendo con mayor id: ");
@@ -70,9 +70,9 @@ public class Controller {
 				break;
 
 			case 3:
-				view.printMessage("Ingrese número del mes");
+				view.printMessage("Ingrese número del mes <Abril=04>");
 				String mes = lector.next();
-				view.printMessage("Ingrese primeras tres letras del día de la semana:");
+				view.printMessage("Ingrese primeras tres letras del día de la semana en inglés <Miercoles = Wed>:");
 				String dia = lector.next();
 				try
 				{
@@ -87,16 +87,19 @@ public class Controller {
 				break;
 
 			case 4:
-				view.printMessage("Ingrese fecha mínima");
+				view.printMessage("Ingrese fecha mínima en formato <yyyy/MM/dd>");
 				try
 				{
 					String m = lector.next();
 					Date min = parser.parse(m);
-					view.printMessage("Ingrese fecha máxima");
+					view.printMessage("Ingrese fecha máxima en formato <yyyy/MM/dd>");
 					String ma = lector.next();
 					Date max = parser.parse(ma);
-					view.printMessage("Ingrese localidad a buscar");
+					view.printMessage("Ingrese localidad a buscar en mayuscula (Si son dos palabras separe con un guion<->)");
 					String loc = lector.next();
+					String[] locs = loc.split("-");
+					if(locs.length>1)
+						loc = locs[0]+" "+locs[1];
 					view.printMessage("Ingrese número de comparendos a buscar");
 					int n = lector.nextInt();
 					ListaEncadenada lista = modelo.tresA(max, min, loc, n);
@@ -117,7 +120,16 @@ public class Controller {
 			case 6:
 				view.printStats(modelo.dosC());
 				break;
-			case 7: 
+				
+			case 7:
+				view.printStats(modelo.tresC());
+				break;
+				
+			case 8:
+				view.printMessage("El costo de implementación del nuevo sistema es mayor a las perdidas que tiene el sistema actual, por ende no es conveniente utilizar el nuevo sistema.");
+				break;
+				
+			case 9: 
 				view.printMessage("--------- \n Hasta pronto !! \n---------"); 
 				lector.close();
 				fin = true;

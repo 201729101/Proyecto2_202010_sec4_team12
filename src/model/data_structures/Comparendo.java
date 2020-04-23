@@ -43,6 +43,11 @@ public class Comparendo implements Comparable<Comparendo>
 	 * Localidad en que se colocó el comparendo
 	 */
 	private String localidad;
+	
+	/**
+	 * Municipio del comparendo
+	 */
+	private String municipio;
 
 	/**
 	 * Latitud en que se colocó el comparendo
@@ -67,7 +72,7 @@ public class Comparendo implements Comparable<Comparendo>
 	 * @param pLat Latitud donde se puso el comparendo
 	 * @param pLong Longitud donde se puso el comparendo
 	 */
-	public Comparendo(int pId, Date pFecha, String pMedio, String pClase, String pTipo, String pInfr, String pDesc, String pLoc, double pLat, double pLong)
+	public Comparendo(int pId, Date pFecha, String pMedio, String pClase, String pTipo, String pInfr, String pDesc, String pLoc, String pMunip ,double pLat, double pLong)
 	{
 		id = pId;
 		fecha = pFecha;
@@ -77,6 +82,7 @@ public class Comparendo implements Comparable<Comparendo>
 		infr = pInfr;
 		desc = pDesc;
 		localidad = pLoc;
+		municipio = pMunip;
 		latitud = pLat;
 		longitud = pLong;
 	}
@@ -159,6 +165,14 @@ public class Comparendo implements Comparable<Comparendo>
 	 */
 	public String getLocalidad() {
 		return localidad;
+	}
+	
+	/**
+	 * Retorna el municpio del comparendo
+	 * @return Municpio del comprendo
+	 */
+	public String getMunicipio() {
+		return municipio;
 	}
 
 

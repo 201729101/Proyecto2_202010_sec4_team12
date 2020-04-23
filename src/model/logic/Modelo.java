@@ -49,14 +49,23 @@ import com.google.gson.stream.JsonReader;
 public class Modelo
 {
 	/**
-	 * Estrutura de datos que tendrá los comparendos
+	 * Tabla hash que tendrá los comparendos con llave de mmes y dia semanal
 	 */
 	private TablaHashES tabla;
 
+	/**
+	 * Cola de priordad con los comparendos con piroridad igual a graved
+	 */
 	private ColaDePrioridad cola;
 
+	/**
+	 * Arreglo de los comparedos 
+	 */
 	private Comparable[] arreglo;
 
+	/**
+	 * Tabla hash con los comparendos con llave de mes y dia del año
+	 */
 	private TablaHashES pros;
 
 	/**
@@ -65,7 +74,7 @@ public class Modelo
 	public Modelo ()
 	{
 		tabla = new TablaHashES();
-		cola = new ColaDePrioridad(20);
+		cola = new ColaDePrioridad(527660);
 		pros = new TablaHashES();
 	}
 
@@ -82,10 +91,9 @@ public class Modelo
 			JsonArray e2 = elem.getAsJsonObject().get("features").getAsJsonArray();
 
 			SimpleDateFormat parser = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
-			Date act = parser.parse("2018/01/01 00:00:00");
-			Cola col = new Cola();
 			Comparendo mayor = null;
 
+			int i = 0;
 			for(JsonElement e: e2) 
 			{
 				int OBJECTID = e.getAsJsonObject().get("properties").getAsJsonObject().get("OBJECTID").getAsInt();
@@ -102,14 +110,15 @@ public class Modelo
 				String INFRACCION = e.getAsJsonObject().get("properties").getAsJsonObject().get("INFRACCION").getAsString();
 				String DES_INFRAC = e.getAsJsonObject().get("properties").getAsJsonObject().get("DES_INFRACCION").getAsString();	
 				String LOCALIDAD = e.getAsJsonObject().get("properties").getAsJsonObject().get("LOCALIDAD").getAsString();
-
+				String MUNICIPIO = e.getAsJsonObject().get("properties").getAsJsonObject().get("MUNICIPIO").getAsString();
+				
 				double longitud = e.getAsJsonObject().get("geometry").getAsJsonObject().get("coordinates").getAsJsonArray()
 						.get(0).getAsDouble();
 
 				double latitud = e.getAsJsonObject().get("geometry").getAsJsonObject().get("coordinates").getAsJsonArray()
 						.get(1).getAsDouble();
 
-				Comparendo c = new Comparendo(OBJECTID, FECHA_HORA, MEDIO_DETE, CLASE_VEHI, TIPO_SERVI, INFRACCION, DES_INFRAC, LOCALIDAD, longitud, latitud);
+				Comparendo c = new Comparendo(OBJECTID, FECHA_HORA, MEDIO_DETE, CLASE_VEHI, TIPO_SERVI, INFRACCION, DES_INFRAC, LOCALIDAD, MUNICIPIO, longitud, latitud);
 				SimpleDateFormat simpleDateformat = new SimpleDateFormat("E"); // the day of the week abbreviated
 				String key = s2[1]+simpleDateformat.format(FECHA_HORA);
 
@@ -117,14 +126,12 @@ public class Modelo
 				agregarES(key, c);
 				agregarESDia(llave,c);
 				cola.insertar(c);
-
 				if(mayor == null) 
 					mayor =c;
 				else if(c.getId()>mayor.getId())
 					mayor = c;
-				arreglo = cola.getArreglo().clone();
-
 			}
+			arreglo = cola.getArreglo().clone();
 			return mayor;
 		} 
 		catch (Exception e) 
@@ -135,14 +142,19 @@ public class Modelo
 		}	
 	}
 
-	public TablaHashES getTablaES() {
-		return tabla;
-	}
-
+	/**
+	 * Retorna la cola de prioridad
+	 * @return
+	 */
 	public ColaDePrioridad getCola() {
 		return cola;
 	}
 
+	/**
+	 * Agrega un allave valor a la tabla hash 
+	 * @param key Llave a agregar
+	 * @param value Valor a agregar
+	 */
 	public void agregarES(String key, Comparendo value)
 	{
 		ListaEncadenada b = (ListaEncadenada) tabla.dar(key);
@@ -159,6 +171,11 @@ public class Modelo
 		}
 	}
 
+	/**
+	 * Agrega un allave valor a la tabla hash
+	 * @param key Llave a agregar
+	 * @param value Valor a agregar
+	 */
 	public void agregarESDia(String key, Comparendo value)
 	{
 		Cola b = (Cola) pros.dar(key);
@@ -181,11 +198,16 @@ public class Modelo
 		}
 	}
 
+	/**
+	 * Primer requerimiento funcional
+	 * @param m Numeor de comparendo a buscar
+	 * @return Lista con los comparendos buscados
+	 */
 	public ListaEncadenada unoA(int m)
 	{
 		ListaEncadenada lista = new ListaEncadenada();
 
-		for(int i = 0 ; i<= m && cola.tamano()>0 ; i++)
+		for(int i = 0 ; i< m && cola.tamano()>0 ; i++)
 		{
 			lista.agregarFinal(cola.eliminarMax());
 		}
@@ -193,11 +215,24 @@ public class Modelo
 		return lista;
 	}
 
+	/**
+	 * Segundo requerimiento funcional
+	 * @param date Mes-DiaSemana a buscar
+	 * @return Lista encadenada con los comparendos buscados
+	 */
 	public ListaEncadenada dosA(String date)
 	{
 		return (ListaEncadenada) tabla.dar(date);
 	}
 
+	/**
+	 * Tercer requerimiento funcional
+	 * @param max Fecha maxima
+	 * @param min Fecha minima
+	 * @param loc Localidad
+	 * @param N Numeor de  comparendos a buscar
+	 * @return
+	 */
 	public ListaEncadenada tresA(Date max, Date min, String loc, int N)
 	{
 		ListaEncadenada lista= new ListaEncadenada();
@@ -209,13 +244,19 @@ public class Modelo
 			Comparendo comp = (Comparendo) arreglo[i];
 			if(comp.getFecha().compareTo(min)>=0)
 			{
-				lista.agregarFinal(arreglo[i]);
+				if(comp.getLocalidad().equals(loc))
+					lista.agregarFinal(arreglo[i]);
 				min=((Comparendo) arreglo[i]).getFecha();
 			}
 		}
 		return lista;
 	}
 
+	/**
+	 * SEptimo requerimiento funcional
+	 * @param D Tamñano de los intevralos
+	 * @return Lista Enacdenada con los comparendos buscados
+	 */
 	public ListaEncadenada unoC(int D)
 	{
 		HeapSort sort = new HeapSort();
@@ -262,6 +303,10 @@ public class Modelo
 		}
 	}
 
+	/**
+	 * Octavo requerimiento funcional
+	 * @return Arreglo de dos listas encadenadas con la información
+	 */
 	public ListaEncadenada[] dosC()
 	{
 		ListaEncadenada retorno = new ListaEncadenada();
@@ -275,9 +320,9 @@ public class Modelo
 			int dif = 0;
 			Cola comps;
 			Cola espera=new Cola();
-			int min400 = 10000000;int max400 = 0;int sum400 = 0;int cont400 = 1;
-			int min40 = 10000000;int max40 = 0;int sum40 = 0;int cont40 = 1;
-			int min4 = 10000000;int max4 = 0;int sum4 = 0;int cont4 = 1;
+			int min400 = 10000000;int max400 = 0;int sum400 = 0;int cont400 = 0;
+			int min40 = 10000000;int max40 = 0;int sum40 = 0;int cont40 = 0;
+			int min4 = 10000000;int max4 = 0;int sum4 = 0;int cont4 = 0;
 			for(Date i = c.getTime() ; i.compareTo(fin)<0 ; c.add(Calendar.DATE, 1))
 			{
 				i=c.getTime();
@@ -375,6 +420,10 @@ public class Modelo
 
 	}
 
+	/**
+	 * Noveno requerimiento funcional
+	 * @return Arreglo de dos listas encadenadas con la informacion
+	 */
 	public ListaEncadenada[] tresC()
 	{
 		ListaEncadenada retorno = new ListaEncadenada();
@@ -388,9 +437,9 @@ public class Modelo
 			int dif = 0;
 			Cola comps;
 			ColaDePrioridadFecha espera=new ColaDePrioridadFecha();
-			int min400 = 10000000;int max400 = 0;int sum400 = 0;int cont400 = 1;
-			int min40 = 10000000;int max40 = 0;int sum40 = 0;int cont40 = 1;
-			int min4 = 10000000;int max4 = 0;int sum4 = 0;int cont4 = 1;
+			int min400 = 10000000;int max400 = 0;int sum400 = 0;int cont400 = 0;
+			int min40 = 10000000;int max40 = 0;int sum40 = 0;int cont40 = 0;
+			int min4 = 10000000;int max4 = 0;int sum4 = 0;int cont4 = 0;
 			for(Date i = c.getTime() ; i.compareTo(fin)<0 ; c.add(Calendar.DATE, 1))
 			{
 				i=c.getTime();
