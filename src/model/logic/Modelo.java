@@ -316,6 +316,7 @@ public class Modelo
 			Date min = parser.parse("2018/01/01");
 			Date fin = parser.parse("2019/01/01");
 			Calendar c = Calendar.getInstance();
+			Calendar cal = Calendar.getInstance();
 			c.setTime(min);
 			int dif = 0;
 			Cola comps;
@@ -358,7 +359,9 @@ public class Modelo
 					while(j<1500 && !espera.esVacia())
 					{
 						Comparendo act = (Comparendo) espera.eliminar();
-						int des= (int) TimeUnit.DAYS.convert(Math.abs(act.getFecha().getTime() - i.getTime()),TimeUnit.MILLISECONDS);
+						cal.setTime(act.getFecha());
+						int des = c.get(Calendar.DAY_OF_YEAR)-cal.get(Calendar.DAY_OF_YEAR);
+//						int des= (int) TimeUnit.DAYS.convert(Math.abs(act.getFecha().getTime() - i.getTime()),TimeUnit.MILLISECONDS);
 						if(act.getDesc().contains("SERA INMOVILIZADO")||act.getDesc().contains("SERÁ INMOVILIZADO"))
 						{
 							if(des>max400)
@@ -397,13 +400,18 @@ public class Modelo
 					while(!comps.esVacia())
 						espera.agregar(comps.eliminar());
 				}
-
 			}
 			ListaEncadenada<String> lista = new ListaEncadenada<String>();
+			if(cont400==0)
+			{cont400=1; min400=0;}
 			int prom400 = (int) sum400/cont400;
 			lista.agregarFinal("400,"+min400+","+prom400+","+max400);
+			if(cont40==0)
+			{cont40=1; min40=0;}
 			int prom40 = (int) sum40/cont40;
 			lista.agregarFinal(" 40,"+min40+","+prom40+","+max40);
+			if(cont4==0)
+			{cont4=1; min4=0;}
 			int prom4 = (int) sum4/cont4;
 			lista.agregarFinal("  4,"+min4+","+prom4+","+max4);
 
@@ -433,10 +441,11 @@ public class Modelo
 			Date min = parser.parse("2018/01/01");
 			Date fin = parser.parse("2019/01/01");
 			Calendar c = Calendar.getInstance();
+			Calendar cal = Calendar.getInstance();
 			c.setTime(min);
 			int dif = 0;
 			Cola comps;
-			ColaDePrioridadFecha espera=new ColaDePrioridadFecha();
+			ColaDePrioridadFecha espera=new ColaDePrioridadFecha(527660);
 			int min400 = 10000000;int max400 = 0;int sum400 = 0;int cont400 = 0;
 			int min40 = 10000000;int max40 = 0;int sum40 = 0;int cont40 = 0;
 			int min4 = 10000000;int max4 = 0;int sum4 = 0;int cont4 = 0;
@@ -475,7 +484,9 @@ public class Modelo
 					while(j<1500 && !espera.esVacia())
 					{
 						Comparendo act = (Comparendo) espera.eliminar();
-						int des= (int) TimeUnit.DAYS.convert(Math.abs(act.getFecha().getTime() - i.getTime()),TimeUnit.MILLISECONDS);
+						cal.setTime(act.getFecha());
+						int des = c.get(Calendar.DAY_OF_YEAR)-cal.get(Calendar.DAY_OF_YEAR);
+//						int des= (int) TimeUnit.DAYS.convert(Math.abs(act.getFecha().getTime() - i.getTime()),TimeUnit.MILLISECONDS);
 						if(act.getDesc().contains("SERA INMOVILIZADO")||act.getDesc().contains("SERÁ INMOVILIZADO"))
 						{
 							if(des>max400)
@@ -517,10 +528,16 @@ public class Modelo
 
 			}
 			ListaEncadenada<String> lista = new ListaEncadenada<String>();
+			if(cont400==0)
+			{cont400=1; min400=0;}
 			int prom400 = (int) sum400/cont400;
 			lista.agregarFinal("400,"+min400+","+prom400+","+max400);
+			if(cont40==0)
+			{cont40=1; min40=0;}
 			int prom40 = (int) sum40/cont40;
 			lista.agregarFinal(" 40,"+min40+","+prom40+","+max40);
+			if(cont4==0)
+			{cont4=1; min4=0;}
 			int prom4 = (int) sum4/cont4;
 			lista.agregarFinal("  4,"+min4+","+prom4+","+max4);
 

@@ -163,7 +163,7 @@ public class View
 			{
 				String info = (String) n.darElemento();
 				String[] infos = info.split(",");
-				System.out.println(infos[0]+"          |"+infos[1]+"       |"+infos[2]+"                |"+infos[3]);
+				System.out.println(infos[0]+"          |"+infos[1]+"              |"+infos[2]+"                |"+infos[3]);
 			}
 		}
 		catch(Exception e)
