@@ -32,8 +32,8 @@ public class View
 		System.out.println("3. 2A");
 		System.out.println("4. 3A");
 		System.out.println("5. 1C");
-		System.out.println("6. 2C (Solo si no ha corrido la opción 3C)");
-		System.out.println("7. 3C (Solo si no ha corrido la opción 2C)");
+		System.out.println("6. 2C");
+		System.out.println("7. 3C");
 		System.out.println("8. Conclusión");
 		System.out.println("9. Exit");
 		System.out.println("Dar el numero de opcion a resolver, luego oprimir tecla Return: (e.g., 1):");
@@ -111,7 +111,7 @@ public class View
 				{
 					asts += "*";
 				}
-				System.out.println(min+"-"+max+": "+asts);
+				System.out.println("2018/"+min.getMonth()+"/"+min.getDate()+" - 2018/"+max.getMonth()+"/"+max.getDate()+": "+asts);
 				c.setTime(max);
 				c.add(Calendar.DATE, 1);
 				min=c.getTime();

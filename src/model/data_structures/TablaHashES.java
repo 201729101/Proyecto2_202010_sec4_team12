@@ -15,22 +15,12 @@ public class TablaHashES<K extends Comparable<K> , V>
 	/**
 	 * Capacidad de la tabla
 	 */
-	private int M = 365;
-
-	/**
-	 * Capacidad inicial de la tabla
-	 */
-	private int Mi;
-
-	/**
-	 * Numero de rehashes en la tabla
-	 */
-	private int R;
+	private int M = 20;
 
 	/**
 	 * Clase que representa los nodos encadenados 
 	 */
-	public class Node<K extends Comparable<K> , V > 
+	private class Node<K extends Comparable<K> , V > 
 	{
 		/**
 		 * Referencia al siguiente nodo
@@ -118,7 +108,7 @@ public class TablaHashES<K extends Comparable<K> , V>
 	/**
 	 * Clase que repreenta las cadenas de la tabla
 	 */
-	public class Chain<K extends Comparable<K>, V>
+	private class Chain<K extends Comparable<K>, V>
 	{
 		/**
 		 * PRimer nodo de la cadena
@@ -174,7 +164,6 @@ public class TablaHashES<K extends Comparable<K> , V>
 	public TablaHashES() 
 	{
 		values = new Chain[M];
-		Mi=M;
 	}
 
 	/**
@@ -184,6 +173,7 @@ public class TablaHashES<K extends Comparable<K> , V>
 	public TablaHashES(int cap)
 	{
 		values = new Chain[cap];
+		M = cap;
 	}
 
 	/**
@@ -253,22 +243,6 @@ public class TablaHashES<K extends Comparable<K> , V>
 	public int getN() {
 		return N;
 	}
-	
-	/**
-	 * Retorna la capacidad inicial de la tabla
-	 * @return Capacida inicial de la tabla
-	 */
-	public int getMi() {
-		return Mi;
-	}
-	
-	/**
-	 * Retorna el numero de rahashes en la tabla
-	 * @return Número de rehashes en la tabla
-	 */
-	public int getR() {
-		return R;
-	}
 
 	/**
 	 * Retorna el arreglo de cadenas de la tabla
@@ -292,7 +266,6 @@ public class TablaHashES<K extends Comparable<K> , V>
 					t.agregar((K) n.getKey(), (V) n.getValue());        
 		values = t.values;    
 		M    = t.M; 
-		R++;
 	}
 
 	/** 

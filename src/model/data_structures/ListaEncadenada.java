@@ -1,11 +1,13 @@
 package model.data_structures;
 
+import java.util.Iterator;
+
 import model.data_structures.Nodo;
 
 /**
  * Clase de la estructura de datos lista encadenada
  */
-public class ListaEncadenada< E extends Comparable<E>> implements Comparable
+public class ListaEncadenada< E extends Comparable<E>> implements Comparable,Iterable
 {
 	/**
 	 * Referencia al primer elemento de la lista
@@ -222,4 +224,28 @@ public class ListaEncadenada< E extends Comparable<E>> implements Comparable
 		// TODO Auto-generated method stub
 		return 0;
 	}
+
+	@Override
+	public Iterator<E> iterator() {
+		// TODO Auto-generated method stub
+		return new ListIterator();
+	}
+	
+	private class ListIterator implements Iterator
+	{
+		private Nodo actual = primero;
+		
+		public boolean hasNext()
+		{return actual!=null;}
+		
+		public void remove(){}
+		
+		public E next(){
+			E elemento = (E) actual.darElemento();
+			actual = actual.darSiguiente();
+			return elemento;
+		}
+	}
+	
+	
 }

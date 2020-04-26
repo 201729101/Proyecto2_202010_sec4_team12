@@ -85,9 +85,13 @@ public class ColaDePrioridad<E extends Comparable<E>>
 		{
 			return compi.getInfr().compareTo(compk.getInfr())<0;
 		}
+		else if(!compi.getTipo().equals("Oficial")&&!compk.getTipo().equals("Oficial"))
+		{
+			return compi.getTipo().equals("Particular");
+		}
 		else
 		{
-			return compk.getClase().equals("Publico");
+			return compi.getTipo().equals("Oficial");
 		}
 //		return arreglo[i].compareTo(arreglo[k])<0;
 	}

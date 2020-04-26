@@ -3,6 +3,7 @@ package model.logic;
 import java.util.Date;
 
 
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -33,7 +34,7 @@ import model.data_structures.Nodo;
 import model.data_structures.TablaHashES;
 import model.data_structures.Cola;
 import model.data_structures.ColaDePrioridad;
-import model.data_structures.ColaDePrioridadFecha;
+import model.data_structures.ColaDePrioridadPrueba;
 
 import java.time.*; 
 import java.time.DayOfWeek;
@@ -49,33 +50,25 @@ import com.google.gson.stream.JsonReader;
 public class Modelo
 {
 	/**
-	 * Tabla hash que tendrá los comparendos con llave de mmes y dia semanal
+	 * Lista Encadenada con los comparendos
 	 */
-	private TablaHashES tabla;
-
+	private ListaEncadenada lista;
+	
 	/**
-	 * Cola de priordad con los comparendos con piroridad igual a graved
+	 * Numero de comparendos
 	 */
-	private ColaDePrioridad cola;
-
-	/**
-	 * Arreglo de los comparedos 
-	 */
-	private Comparable[] arreglo;
-
-	/**
-	 * Tabla hash con los comparendos con llave de mes y dia del año
-	 */
-	private TablaHashES pros;
-
+	public int N;
+	
 	/**
 	 * Constructor
 	 */
 	public Modelo ()
 	{
-		tabla = new TablaHashES();
-		cola = new ColaDePrioridad(527660);
-		pros = new TablaHashES();
+		lista = new ListaEncadenada();
+		N = 0;
+//		tabla = new TablaHashES();
+//		cola = new ColaDePrioridad(50000);
+//		pros = new TablaHashES();
 	}
 
 	/**
@@ -92,8 +85,7 @@ public class Modelo
 
 			SimpleDateFormat parser = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
 			Comparendo mayor = null;
-
-			int i = 0;
+			
 			for(JsonElement e: e2) 
 			{
 				int OBJECTID = e.getAsJsonObject().get("properties").getAsJsonObject().get("OBJECTID").getAsInt();
@@ -119,19 +111,14 @@ public class Modelo
 						.get(1).getAsDouble();
 
 				Comparendo c = new Comparendo(OBJECTID, FECHA_HORA, MEDIO_DETE, CLASE_VEHI, TIPO_SERVI, INFRACCION, DES_INFRAC, LOCALIDAD, MUNICIPIO, longitud, latitud);
-				SimpleDateFormat simpleDateformat = new SimpleDateFormat("E"); // the day of the week abbreviated
-				String key = s2[1]+simpleDateformat.format(FECHA_HORA);
-
-				String llave = s2[1]+"/"+s2[2];
-				agregarES(key, c);
-				agregarESDia(llave,c);
-				cola.insertar(c);
+				lista.agregarFinal(c);
 				if(mayor == null) 
 					mayor =c;
 				else if(c.getId()>mayor.getId())
 					mayor = c;
+				N++;
 			}
-			arreglo = cola.getArreglo().clone();
+			e2 =null;
 			return mayor;
 		} 
 		catch (Exception e) 
@@ -143,19 +130,11 @@ public class Modelo
 	}
 
 	/**
-	 * Retorna la cola de prioridad
-	 * @return
-	 */
-	public ColaDePrioridad getCola() {
-		return cola;
-	}
-
-	/**
 	 * Agrega un allave valor a la tabla hash 
 	 * @param key Llave a agregar
 	 * @param value Valor a agregar
 	 */
-	public void agregarES(String key, Comparendo value)
+	public void agregarES(TablaHashES tabla, String key, Comparendo value)
 	{
 		ListaEncadenada b = (ListaEncadenada) tabla.dar(key);
 
@@ -172,11 +151,11 @@ public class Modelo
 	}
 
 	/**
-	 * Agrega un allave valor a la tabla hash
+	 * Agrega un allave valor a la tabla hash con valores de cola
 	 * @param key Llave a agregar
 	 * @param value Valor a agregar
 	 */
-	public void agregarESDia(String key, Comparendo value)
+	public void agregarESDia(TablaHashES pros, String key, Comparendo value)
 	{
 		Cola b = (Cola) pros.dar(key);
 		try
@@ -197,6 +176,34 @@ public class Modelo
 			e.printStackTrace();
 		}
 	}
+	
+	/**
+	 * Agrega una llave-valor a una tabla hash con valores de colas de prioridad
+	 * @param table Tabla hash a modificar
+	 * @param key Llave a ingresar
+	 * @param value Valor a ingresar
+	 */
+	public void agregarESPrueba(TablaHashES table, String key, Comparendo value)
+	{
+		ColaDePrioridadPrueba b = (ColaDePrioridadPrueba) table.dar(key);
+		try
+		{
+			if(b==null)
+			{
+				b = new ColaDePrioridadPrueba<Comparendo>(1000000);
+				b.insertar(value);
+				table.agregar(key, b);
+			}
+			else
+			{
+				b.insertar(value);
+			}
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 
 	/**
 	 * Primer requerimiento funcional
@@ -205,14 +212,21 @@ public class Modelo
 	 */
 	public ListaEncadenada unoA(int m)
 	{
-		ListaEncadenada lista = new ListaEncadenada();
+		ColaDePrioridad cola = new ColaDePrioridad(1000000);
+		ListaEncadenada l = new ListaEncadenada();
+		
+		for(Object e:lista)
+		{
+			Comparendo act = (Comparendo) e;
+			cola.insertar(act);
+		}
 
 		for(int i = 0 ; i< m && cola.tamano()>0 ; i++)
 		{
-			lista.agregarFinal(cola.eliminarMax());
+			l.agregarFinal(cola.eliminarMax());
 		}
 
-		return lista;
+		return l;
 	}
 
 	/**
@@ -222,6 +236,21 @@ public class Modelo
 	 */
 	public ListaEncadenada dosA(String date)
 	{
+		TablaHashES tabla = new TablaHashES();
+		SimpleDateFormat simpleDateformat = new SimpleDateFormat("E"); // the day of the week abbreviated
+		
+		for(Object e:lista)
+		{
+			Comparendo act = (Comparendo) e;
+			Date fecha = act.getFecha();
+			int MES = fecha.getMonth()+1;
+			String mes = ""+MES;
+			if(MES<10)
+				mes="0"+mes;
+			String key = mes+simpleDateformat.format(fecha);
+			agregarES(tabla,key, act);
+		}
+		
 		return (ListaEncadenada) tabla.dar(date);
 	}
 
@@ -235,21 +264,29 @@ public class Modelo
 	 */
 	public ListaEncadenada tresA(Date max, Date min, String loc, int N)
 	{
-		ListaEncadenada lista= new ListaEncadenada();
+		ListaEncadenada l= new ListaEncadenada();
+		Comparendo[] arreglo = new Comparendo[21];
+		int j=1;
+		for(Object e:lista)
+		{
+			Comparendo act = (Comparendo) e;
+			arreglo[j]=act;
+			j++;
+		}
 		HeapSort sort = new HeapSort();
 		sort.sort(arreglo);
 
-		for(int i=1 ; i<arreglo.length && lista.darTamano()<N && min.compareTo(max)<=0 ; i++)
+		for(int i=1 ; i<arreglo.length && l.darTamano()<N && min.compareTo(max)<=0 ; i++)
 		{
 			Comparendo comp = (Comparendo) arreglo[i];
 			if(comp.getFecha().compareTo(min)>=0)
 			{
 				if(comp.getLocalidad().equals(loc))
-					lista.agregarFinal(arreglo[i]);
+					l.agregarFinal(arreglo[i]);
 				min=((Comparendo) arreglo[i]).getFecha();
 			}
 		}
-		return lista;
+		return l;
 	}
 
 	/**
@@ -259,6 +296,14 @@ public class Modelo
 	 */
 	public ListaEncadenada unoC(int D)
 	{
+		Comparendo[] arreglo = new Comparendo[21];
+		int j=1;
+		for(Object e:lista)
+		{
+			Comparendo act = (Comparendo) e;
+			arreglo[j]=act;
+			j++;
+		}
 		HeapSort sort = new HeapSort();
 		sort.sort(arreglo);
 		//		Comparable[] a = arreglo;
@@ -310,6 +355,21 @@ public class Modelo
 	public ListaEncadenada[] dosC()
 	{
 		ListaEncadenada retorno = new ListaEncadenada();
+		TablaHashES pros = new TablaHashES();
+		for(Object e:lista)
+		{
+			Comparendo act = (Comparendo) e;
+			Date fecha =act.getFecha();
+			int mes = fecha.getMonth()+1;
+			int dia = fecha.getDate();
+			String MES=""+mes;
+			String DIA=""+dia;
+			if(mes<10)
+				MES="0"+mes;
+			if(dia<10)
+				DIA="0"+dia;
+			agregarESDia(pros,MES+"/"+DIA, act);
+		}
 		try
 		{
 			SimpleDateFormat parser = new SimpleDateFormat("yyyy/MM/dd");
@@ -335,6 +395,10 @@ public class Modelo
 					MES="0"+mes;
 				if(dia<10)
 					DIA="0"+dia;
+				
+				String prueba;
+				if(mes==3 && dia ==13)
+					prueba = null;
 
 				comps = (Cola) pros.dar(MES+"/"+DIA);
 				int cant = dif;
@@ -401,22 +465,22 @@ public class Modelo
 						espera.agregar(comps.eliminar());
 				}
 			}
-			ListaEncadenada<String> lista = new ListaEncadenada<String>();
+			ListaEncadenada<String> l = new ListaEncadenada<String>();
 			if(cont400==0)
 			{cont400=1; min400=0;}
 			int prom400 = (int) sum400/cont400;
-			lista.agregarFinal("400,"+min400+","+prom400+","+max400);
+			l.agregarFinal("400,"+min400+","+prom400+","+max400);
 			if(cont40==0)
 			{cont40=1; min40=0;}
 			int prom40 = (int) sum40/cont40;
-			lista.agregarFinal(" 40,"+min40+","+prom40+","+max40);
+			l.agregarFinal(" 40,"+min40+","+prom40+","+max40);
 			if(cont4==0)
 			{cont4=1; min4=0;}
 			int prom4 = (int) sum4/cont4;
-			lista.agregarFinal("  4,"+min4+","+prom4+","+max4);
+			l.agregarFinal("  4,"+min4+","+prom4+","+max4);
 
 			ListaEncadenada<String>[] ret = new ListaEncadenada[2];
-			ret[0] = lista;
+			ret[0] = l;
 			ret[1] = retorno;
 			return ret;
 		}
@@ -435,6 +499,21 @@ public class Modelo
 	public ListaEncadenada[] tresC()
 	{
 		ListaEncadenada retorno = new ListaEncadenada();
+		TablaHashES pros = new TablaHashES();
+		for(Object e:lista)
+		{
+			Comparendo act = (Comparendo) e;
+			Date fecha =act.getFecha();
+			int mes = fecha.getMonth()+1;
+			int dia = fecha.getDate();
+			String MES=""+mes;
+			String DIA=""+dia;
+			if(mes<10)
+				MES="0"+mes;
+			if(dia<10)
+				DIA="0"+dia;
+			agregarESPrueba(pros,MES+"/"+DIA, act);
+		}
 		try
 		{
 			SimpleDateFormat parser = new SimpleDateFormat("yyyy/MM/dd");
@@ -444,8 +523,8 @@ public class Modelo
 			Calendar cal = Calendar.getInstance();
 			c.setTime(min);
 			int dif = 0;
-			Cola comps;
-			ColaDePrioridadFecha espera=new ColaDePrioridadFecha(527660);
+			ColaDePrioridadPrueba comps;
+			ColaDePrioridadPrueba espera=new ColaDePrioridadPrueba(1000000);
 			int min400 = 10000000;int max400 = 0;int sum400 = 0;int cont400 = 0;
 			int min40 = 10000000;int max40 = 0;int sum40 = 0;int cont40 = 0;
 			int min4 = 10000000;int max4 = 0;int sum4 = 0;int cont4 = 0;
@@ -461,11 +540,11 @@ public class Modelo
 				if(dia<10)
 					DIA="0"+dia;
 
-				comps = (Cola) pros.dar(MES+"/"+DIA);
+				comps = (ColaDePrioridadPrueba) pros.dar(MES+"/"+DIA);
 				int cant = dif;
 				if(comps!=null)
 				{
-					cant += comps.darTamano();
+					cant += comps.tamano();
 
 					String dato = MES+","+DIA+",";
 					if(cant>1500)
@@ -527,22 +606,22 @@ public class Modelo
 				}
 
 			}
-			ListaEncadenada<String> lista = new ListaEncadenada<String>();
+			ListaEncadenada<String> l = new ListaEncadenada<String>();
 			if(cont400==0)
 			{cont400=1; min400=0;}
 			int prom400 = (int) sum400/cont400;
-			lista.agregarFinal("400,"+min400+","+prom400+","+max400);
+			l.agregarFinal("400,"+min400+","+prom400+","+max400);
 			if(cont40==0)
 			{cont40=1; min40=0;}
 			int prom40 = (int) sum40/cont40;
-			lista.agregarFinal(" 40,"+min40+","+prom40+","+max40);
+			l.agregarFinal(" 40,"+min40+","+prom40+","+max40);
 			if(cont4==0)
 			{cont4=1; min4=0;}
 			int prom4 = (int) sum4/cont4;
-			lista.agregarFinal("  4,"+min4+","+prom4+","+max4);
+			l.agregarFinal("  4,"+min4+","+prom4+","+max4);
 
 			ListaEncadenada<String>[] ret = new ListaEncadenada[2];
-			ret[0] = lista;
+			ret[0] = l;
 			ret[1] = retorno;
 			return ret;
 		}

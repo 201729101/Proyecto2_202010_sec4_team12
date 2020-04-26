@@ -1,11 +1,15 @@
 package model.data_structures;
 
-public class ColaDePrioridadFecha<E extends Comparable<E>> 
+import java.util.ArrayList;
+
+public class ColaDePrioridadPrueba<E extends Comparable<E>> 
 {
 	/**
 	 * Arreglo de la cola
 	 */
 	private E[] arreglo;
+	
+//	private ArrayList<E> arreglo;
 
 	/**
 	 * Capacidad de la cola
@@ -15,16 +19,18 @@ public class ColaDePrioridadFecha<E extends Comparable<E>>
 	/**
 	 * Contructor de la cola
 	 */
-	public ColaDePrioridadFecha() 
+	public ColaDePrioridadPrueba() 
 	{
 		arreglo = (E[]) new Comparable[N+1]; 
+//		arreglo = new ArrayList<E>();
+//		arreglo.add(null);
 	}
 
 	/**
 	 * Contructor de la cola con un acapacidad inical
 	 * @param m Capacidad de la cola
 	 */
-	public ColaDePrioridadFecha(int m) 
+	public ColaDePrioridadPrueba(int m) 
 	{
 		arreglo = (E[]) new Comparable[m+1]; 
 	}
@@ -35,6 +41,8 @@ public class ColaDePrioridadFecha<E extends Comparable<E>>
 	 */
 	public void insertar(E elem)
 	{
+//		arreglo.add(elem);
+//		++N;
 		arreglo[++N] = elem;
 		swim(N);
 
@@ -46,9 +54,11 @@ public class ColaDePrioridadFecha<E extends Comparable<E>>
 	 */
 	public E eliminar()
 	{
-		E max = arreglo[1];           // Retrieve max key from top.      
+		E max = arreglo[1];  // Retrieve max key from top.
+//		E max = arreglo.get(1);
 		exch(1, N--);              // Exchange with last item.      
-		arreglo[N+1] = null;            // Avoid loitering.      
+		arreglo[N+1] = null;            // Avoid loitering.     
+//		arreglo.set(N+1, null);
 		sink(1);                   // Restore heap property.      
 		return max;
 	}
@@ -79,19 +89,28 @@ public class ColaDePrioridadFecha<E extends Comparable<E>>
 	 */
 	public boolean less(int i, int k)
 	{
+//		Comparendo comp1 = (Comparendo) arreglo.get(i);
+//		Comparendo comp2 = (Comparendo) arreglo.get(k);
 		Comparendo comp1 = (Comparendo) arreglo[i];
 		Comparendo comp2 = (Comparendo) arreglo[k];
-		if(((comp1.getDesc().contains("SERA INMOVILIZADO")||comp1.getDesc().contains("SERÁ INMOVILIZADO"))&&(comp2.getDesc().contains("SERA INMOVILIZADO"))||(comp2.getDesc().contains("SERÁ INMOVILIZADO")))||((comp1.getDesc().contains("LICENCIA DE CONDUCCIÓN"))&&(comp2.getDesc().contains("LICENCIA DE CONDUCCIÓN"))))
-			return arreglo[i].compareTo(arreglo[k])>0;
-		if(comp1.getDesc().contains("SERA INMOVILIZADO")||comp1.getDesc().contains("SERÁ INMOVILIZADO"))
+		boolean inm1 = comp1.getDesc().contains("SERA INMOVILIZADO")||comp1.getDesc().contains("SERÁ INMOVILIZADO");
+		boolean inm2 = comp2.getDesc().contains("SERA INMOVILIZADO")||comp2.getDesc().contains("SERÁ INMOVILIZADO");
+		boolean lic1 = comp1.getDesc().contains("LICENCIA DE CONDUCCIÓN");
+		boolean lic2 = comp2.getDesc().contains("LICENCIA DE CONDUCCIÓN");
+		if((inm1&&inm2)||(lic1&&lic2))
+//			return arreglo.get(i).compareTo(arreglo.get(k))<0;
+			return arreglo[i].compareTo(arreglo[k])<0;
+		else if(inm1)
 			return false;
-		if(comp2.getDesc().contains("SERA INMOVILIZADO")||comp2.getDesc().contains("SERÁ INMOVILIZADO"))
+		else if(inm2)
 			return true;
-		if(comp1.getDesc().contains("LICENCIA DE CONDUCCIÓN"))
+		else if(lic1)
 			return false;
-		if(comp2.getDesc().contains("LICENCIA DE CONDUCCIÓN"))
+		else if(lic2)
 			return true;
-		return arreglo[i].compareTo(arreglo[k])>0;
+		else
+//			return arreglo.get(i).compareTo(arreglo.get(k))<0;
+			return arreglo[i].compareTo(arreglo[k])<0;
 	}
 
 	/**
@@ -101,7 +120,9 @@ public class ColaDePrioridadFecha<E extends Comparable<E>>
 	 */
 	public void exch(int i, int k)
 	{
+//		E t = arreglo.get(i);
 		E t = arreglo[i];
+//		arreglo.set(i, arreglo.get(k));
 		arreglo[i] = arreglo[k];
 		arreglo[k] = t;
 	}

@@ -69,6 +69,7 @@ public class Comparendo implements Comparable<Comparendo>
 	 * @param pInfr Código de la infracción colocada
 	 * @param pDesc Descripcion del comparendo
 	 * @param pLoc Localidad donde se puso el comparendo
+	 * @param pMun Municipio de a localidad
 	 * @param pLat Latitud donde se puso el comparendo
 	 * @param pLong Longitud donde se puso el comparendo
 	 */
@@ -179,7 +180,7 @@ public class Comparendo implements Comparable<Comparendo>
 	@Override
 	public int compareTo(Comparendo arg0) 
 	{
-		return fecha.compareTo(arg0.getFecha());
+		return (this.fecha).compareTo(arg0.getFecha());
 	}
 	
 	public boolean equals(Comparendo obj) 
